@@ -12,5 +12,5 @@ const categorySchema = new mongoose.Schema({
     ref:'Category'
   }
 },{timestamps:true});
-const Category=mongoose.model("User",categorySchema)
+const Category=mongoose.model("Category",categorySchema)
 export default Category
