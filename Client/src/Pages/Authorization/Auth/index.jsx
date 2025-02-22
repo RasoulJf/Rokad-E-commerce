@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import fetchData from '../../../Utils/fetchData';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import fetchData from "../../../Utils/fetchData";
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
-  const [phoneNumber, setPhoneNumber] = useState('');
-const navigate=useNavigate()
-  const handleSubmit = async(e) => {
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const res=await fetchData('auth',{
+    const res = await fetchData("auth", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
       },
       body: JSON.stringify({ phoneNumber }),
-    })
+    });
   };
 
   const handleForgotPassword = () => {
-    navigate('/forget-pass')
+    navigate("/forget-pass");
   };
 
   return (
@@ -26,7 +26,10 @@ const navigate=useNavigate()
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="phoneNumber"
+              className="block text-sm font-medium text-gray-700"
+            >
               Phone Number
             </label>
             <input
