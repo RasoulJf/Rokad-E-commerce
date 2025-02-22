@@ -7,5 +7,5 @@ const variantSchema=new mongoose.Schema({
         type:String
     }
 })
-const Variant=mongoose.Schema("User",variantSchema)
+const Variant=mongoose.model("User",variantSchema)
 export default Variant
