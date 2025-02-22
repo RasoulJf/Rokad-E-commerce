@@ -100,7 +100,7 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
     if (!verifyResult.success) {
         return next(new HandleERROR("invalid code", 400))
     }
-    const regex = new RegExp = (/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,$/)
+    const regex = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,$/)
     if (!regex.test(password)) {
         return next(new HandleERROR('invalid password', 400))
     }
