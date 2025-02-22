@@ -26,8 +26,8 @@ export const auth = catchAsync(async (req, res, next) => {
                 message: "code sent"
             })
         } else {
-            return res.status(200).json({
-                success: true,
+            return res.status(404).json({
+                success: false,
                 newAccount: user._id ? false : true,
                 password: false,
                 message: "check phone number and try again"
