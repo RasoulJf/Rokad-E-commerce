@@ -14,7 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static("Public"));
-app.use('/auth',authRouter)
+app.use('/api/auth',authRouter)
 app.use("*", (req, res, next) => {
   next(new HandleERROR("Route not Found", 404));
 });
