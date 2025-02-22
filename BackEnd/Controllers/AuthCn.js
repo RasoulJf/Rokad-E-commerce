@@ -5,11 +5,12 @@ import { sendAuthCode, verifyCode } from "../Utils/smsHandler.js";
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 export const auth = catchAsync(async (req, res, next) => {
-    const { phonNumber = null } = req.body
-    if (!phonNumber) {
+    const { phoneNumber = null } = req.body
+    
+    if (!phoneNumber) {
         return next(new HandleERROR("PhoneNumber is required", 400))
     }
-    const user = await User.findOne({ phonNumber })
+    const user = await User.findOne({ phoneNumber })
     if (user && user?.password) {
         return res.status(200).json({
             success: true,
@@ -17,7 +18,7 @@ export const auth = catchAsync(async (req, res, next) => {
             password: true
         })
     } else {
-        const resultSms = await sendAuthCode(phonNumber)
+        const resultSms = await sendAuthCode(phoneNumber)
         if (resultSms?.success) {
             return res.status(200).json({
                 success: true,
@@ -28,7 +29,7 @@ export const auth = catchAsync(async (req, res, next) => {
         } else {
             return res.status(404).json({
                 success: false,
-                newAccount: user._id ? false : true,
+                newAccount: user?._id ? false : true,
                 password: false,
                 message: "check phone number and try again"
             })
@@ -45,7 +46,7 @@ export const checkOtp = catchAsync(async (req, res, next) => {
         return next(new HandleERROR("invalid code", 400))
     }
     let user;
-    if (newAccount) {
+    if (newAccount == 'true') {
         user = await User.create({ phoneNumber })
     } else {
         user = await User.findOne({ phoneNumber })
@@ -53,14 +54,14 @@ export const checkOtp = catchAsync(async (req, res, next) => {
     const token = jwt.sign({ id: user._id, role: user.role, phoneNumber: user.phoneNumber }, process.env.JWT_SECRET)
     return res.status(newAccount ? 201 : 200).json({
         success: true,
-        message: newAccount ? 'register successfully' : 'login successfully',
+        message: newAccount == 'true' ? 'register successfully' : 'login successfully',
         token,
         data: {
             phoneNumber,
             id: user._id,
             role: user.role,
-            favoriteProduct: user?.favoriteProduct,
-            fullName: user?.fullName
+            favoriteProduct: user?.favoriteProducts,
+            fullName: user?.fullname
         }
     })
 })
@@ -121,11 +122,11 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
     })
 })
 export const resendCode = catchAsync(async (req, res, next) => {
-    const { phonNumber = null } = req.body
-    if (!phonNumber) {
+    const { phoneNumber = null } = req.body
+    if (!phoneNumber) {
         return next(new HandleERROR("PhoneNumber is required", 400))
     }
-    const resultSms = await sendAuthCode(phonNumber)
+    const resultSms = await sendAuthCode(phoneNumber)
     return res.status(newAccount ? 201 : 200).json({
         success: resultSms.success,
         message: resultSms.success ? 'code sent' : resultSms.message,
