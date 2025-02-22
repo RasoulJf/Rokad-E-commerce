@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import fetchData from "../../../Utils/fetchData";
+import fetchData from '../../../Utils/fetchData'
 import { useNavigate } from "react-router-dom";
 import notify from "../../../Utils/notify";
 
@@ -8,7 +8,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     if(!phoneNumber){
-      notify('please enter you phone number','error')
+      notify('please enter your phone number','error')
     }
     e.preventDefault();
     const res = await fetchData("auth", {
