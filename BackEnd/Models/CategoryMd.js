@@ -12,5 +12,5 @@ const categorySchema=new mongoose.Schema({
         ref:"Category"
     }
 })
-const Category=mongoose.Schema("Category",categorySchema)
+const Category=mongoose.model("Category",categorySchema)
 export default Category
