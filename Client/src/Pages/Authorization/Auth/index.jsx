@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import fetchData from "../../../Utils/fetchData";
 import { useNavigate } from "react-router-dom";
+import notify from "../../../Utils/notify";
 
 const Auth = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
+    if(!phoneNumber){
+      notify('please enter you phone number','error')
+    }
     e.preventDefault();
     const res = await fetchData("auth", {
       method: "POST",
@@ -14,6 +18,17 @@ const Auth = () => {
       },
       body: JSON.stringify({ phoneNumber }),
     });
+    localStorage.setItem('phoneNumber',phoneNumber)
+    localStorage.setItem('newAccount',res.newAccount)
+    if(res.success){
+if(res.password){
+navigate('pass')
+}else{
+  navigate('otp')
+}
+    }else{
+
+    }
   };
 
   const handleForgotPassword = () => {
