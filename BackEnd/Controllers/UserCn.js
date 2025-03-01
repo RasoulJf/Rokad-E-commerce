@@ -1,7 +1,7 @@
-import User from "../Models/UserMd";
-import ApiFeatures from "../Utils/apiFeatures";
-import catchAsync from "../Utils/catchAsync";
-import HandleERROR from "../Utils/handleError";
+import User from "../Models/UserMd.js";
+import ApiFeatures from "../Utils/apiFeatures.js";
+import catchAsync from "../Utils/catchAsync.js";
+import HandleERROR from "../Utils/handleError.js";
 
 export const getAllUsers = catchAsync(async (req, res, next) => {
   const features = new ApiFeatures(User, req.query)
@@ -34,10 +34,10 @@ export const updateUser = catchAsync(async (req, res, next) => {
   if (req.role != "admin" && req.userId != id) {
     return new HandleERROR("You Dont Have Permission", 401);
   }
-  const { fullName = null, username = null, role = null } = req.body;
+  const { fullname = null, username = null, role = null } = req.body;
 
   const user = await User.findById(id);
-  user.fullname = fullName || user?.fullname;
+  user.fullname = fullname || user?.fullname;
   user.username = username || user?.username;
   if (req.role == "admin" && role) {
     user.role = role;
