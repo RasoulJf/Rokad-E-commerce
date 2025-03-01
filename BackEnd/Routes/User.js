@@ -1,7 +1,7 @@
 import express from 'express'
 import isAdmin from '../MiddleWare/isAdmin.js'
 import isLogin from '../MiddleWare/isLogin.js'
-import { getAllUsers, getOneUser, updateUser } from '../Controllers/UserCn'
+import { getAllUsers, getOneUser, updateUser } from '../Controllers/UserCn.js'
 
 const userRouter = express.Router()
 
