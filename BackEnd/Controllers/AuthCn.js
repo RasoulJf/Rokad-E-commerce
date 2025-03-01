@@ -116,8 +116,8 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
             phoneNumber,
             id: user._id,
             role: user.role,
-            favoriteProduct: user?.favoriteProduct,
-            fullName: user?.fullName
+            favoriteProduct: user?.favoriteProducts,
+            fullName: user?.fullname
         }
     })
 })
