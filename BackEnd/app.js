@@ -8,6 +8,9 @@ import authRouter from "./Routes/auth.js";
 import userRouter from "./Routes/User.js";
 import isLogin from "./MiddleWare/isLogin.js";
 import addressRouter from "./Routes/Adddres.js";
+import brandsRouter from "./Routes/Brands.js";
+import categoryRouter from "./Routes/Category.js";
+import sliderRouter from "./Routes/Slider.js";
 
 const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
@@ -20,6 +23,9 @@ app.use(express.static("Public"));
 app.use('/api/auth',authRouter)
 app.use('/api/users',userRouter)
 app.use('/api/addresses',isLogin,addressRouter)
+app.use('/api/brands',brandsRouter)
+app.use('/api/categories',categoryRouter)
+app.use('/api/sliders',sliderRouter)
 app.use("*", (req, res, next) => {
   next(new HandleERROR("Route not Found", 404));
 });
