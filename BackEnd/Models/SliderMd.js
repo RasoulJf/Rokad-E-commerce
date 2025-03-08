@@ -4,11 +4,13 @@ const sliderSchema=mongoose.Schema({
         type:String,
         required:[true,"image is required"]
     },
-    content:{
-        type:String
+    title:{
+        type:String,
+        required:[true,"title is required"]
     },
     href:{
         type:String,
+        required:[true,"href is required"]
     }
 })
 const Slider=mongoose.model("Slider",sliderSchema)
