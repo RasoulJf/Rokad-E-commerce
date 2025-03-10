@@ -6,6 +6,7 @@ import GetAllCategories from "../Pages/Categories/GetAll";
 import Categories from "../Pages/Categories";
 import CreateCategory from "../Pages/Categories/Create";
 import UpdateCategory from "../Pages/Categories/Update";
+import Login from "../Pages/Login";
 
 const checkAuth = () => {
   const state = store.getState();
@@ -31,7 +32,7 @@ const router = createBrowserRouter([
   {
     path: "/login",
     loader: checkLogin,
-    element: <Layout />,
+    element: <Login />,
   },
   {
     path: "/",
