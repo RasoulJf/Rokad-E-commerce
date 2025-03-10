@@ -88,7 +88,7 @@ export const checkPassword = catchAsync(async (req, res, next) => {
             id: user._id,
             role: user.role,
             favoriteProduct: user?.favoriteProduct,
-            fullName: user?.fullName
+            fullName: user?.fullname
         }
     })
 })
@@ -131,5 +131,36 @@ export const resendCode = catchAsync(async (req, res, next) => {
         success: resultSms.success,
         message: resultSms.success ? 'code sent' : resultSms.message,
 
+    })
+})
+
+export const adminLogin = catchAsync(async(req,res,next)=>{
+    const { phoneNumber = null, password = null } = req.body
+    if (!phoneNumber || !code) {
+        return next(new HandleERROR('phoneNumber and password is required', 400))
+    }
+    const user = await User.findOne({ phoneNumber })
+    if (!user) {
+       return next(new HandleERROR('user not exist', 400))
+    }
+    if (user?.role != 'admin'){
+        return next(new HandleERROR('You are not admin', 400))
+
+    }
+    const validPassword = bcryptjs.compareSync(password, user.password)
+    if (!validPassword) {
+        return next(new HandleERROR('password is incorrect', 400))
+    }
+    const token = jwt.sign({ id: user._id, role: user.role, phoneNumber: user.phoneNumber }, process.env.JWT_SECRET)
+    return res.status(200).json({
+        success: true,
+        message: "login successfully",
+        token,
+        data: {
+            phoneNumber,
+            id: user._id,
+            role: user.role,
+            fullName: user?.fullname
+        }
     })
 })
