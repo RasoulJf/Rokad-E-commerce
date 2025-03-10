@@ -1,6 +1,6 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { logout } from "../Store/Slices/AuthSlice";
+import { logout } from "../../Store/Slices/AuthSlice";
 import { useState } from "react";
 import { 
   FiHome, 
