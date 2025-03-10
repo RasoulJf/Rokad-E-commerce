@@ -106,16 +106,18 @@ export const checkPassword = catchAsync(async (req, res, next) => {
 });
 export const forgetPassword = catchAsync(async (req, res, next) => {
   const { phoneNumber = null, code = null, password = null } = req.body;
+  console.log(phoneNumber,code,password)
   if (!phoneNumber || !code) {
     return next(
       new HandleERROR("phoneNumber ande code and password is required", 400)
     );
   }
   const verifyResult = await verifyCode(phoneNumber, code);
+  console.log(verifyResult)
   if (!verifyResult.success) {
     return next(new HandleERROR("invalid code", 400));
   }
-  const regex = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,$/);
+  const regex = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/);
   if (!regex.test(password)) {
     return next(new HandleERROR("invalid password", 400));
   }
@@ -147,7 +149,7 @@ export const resendCode = catchAsync(async (req, res, next) => {
     return next(new HandleERROR("PhoneNumber is required", 400));
   }
   const resultSms = await sendAuthCode(phoneNumber);
-  return res.status(newAccount ? 201 : 200).json({
+  return res.status(201).json({
     success: resultSms.success,
     message: resultSms.success ? "code sent" : resultSms.message,
   });
@@ -155,7 +157,7 @@ export const resendCode = catchAsync(async (req, res, next) => {
 
 export const adminLogin = catchAsync(async (req, res, next) => {
   const { phoneNumber = null, password = null } = req.body;
-  if (!phoneNumber || !code) {
+  if (!phoneNumber || !password) {
     return next(new HandleERROR("phoneNumber and password is required", 400));
   }
   const user = await User.findOne({ phoneNumber });

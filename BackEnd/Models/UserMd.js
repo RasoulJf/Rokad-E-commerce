@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { type } from "os";
 const userSchema=new mongoose.Schema({
     fullname:{
         type:String
@@ -19,6 +20,11 @@ const userSchema=new mongoose.Schema({
             type:mongoose.Schema.Types.ObjectId,
             ref:"Product"
         }]
+    },
+    role:{
+        type:String,
+        enum:["user","admin"],
+        default:'user'
     },
     isComplete:{
         type:Boolean,

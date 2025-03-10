@@ -24,7 +24,7 @@ const dispatch = useDispatch()
   const handleSubmit =async (e) => {
     e.preventDefault();
     if (validate()) {
-      const res = await fetchData('admin',{
+      const res = await fetchData('auth/admin',{
         method:'POST',
         headers:{
             "Content-Type":"application/json"
