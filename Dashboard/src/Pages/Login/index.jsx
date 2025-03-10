@@ -1,12 +1,14 @@
+import { useDispatch } from "react-redux";
 import fetchData from "../../Utils/fetchData";
 import notify from "../../Utils/notify";
 import useFormFields from "../../Utils/useFormFields";
 import { useState } from "react";
+import { login } from "../../Store/Slices/AuthSlice";
 
 const Login = () => {
   const [fields, handleChange] = useFormFields();
   const [errors, setErrors] = useState({});
-
+const dispatch = useDispatch()
   const validate = () => {
     const newErrors = {};
     if (!/^(\\+\d{1,3})?\d{10,14}$/.test(fields.phoneNumber || "")) {
@@ -32,6 +34,7 @@ const Login = () => {
 
       if(res?.success){
         notify(res?.message,'success')
+        dispatch(login({user: res?.data?.user , token: res?.data?.token}))
       }else{
         notify(res?.message,'error')
       }
