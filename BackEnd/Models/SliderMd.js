@@ -12,6 +12,6 @@ const sliderSchema=mongoose.Schema({
         type:String,
         required:[true,"href is required"]
     }
-})
+},{timestamps:true})
 const Slider=mongoose.model("Slider",sliderSchema)
 export default Slider
