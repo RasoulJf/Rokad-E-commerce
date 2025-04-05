@@ -41,7 +41,7 @@ export const getOneProductVariant = catchAsync(async (req, res, next) => {
   });
 });
 
-export const updateProduct = catchAsync(async (req, res, next) => {
+export const updateProductVariant = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const newProductVariant = await ProductVariant.findByIdAndUpdate(id, req.body, {
     new: true,
@@ -56,7 +56,7 @@ export const updateProduct = catchAsync(async (req, res, next) => {
   });
 });
 
-export const deleteProduct = catchAsync(async (req, res, next) => {
+export const deleteProductVariant = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const productVariant = await ProductVariant.findByIdAndDelete(id);
   if (productVariant) {
