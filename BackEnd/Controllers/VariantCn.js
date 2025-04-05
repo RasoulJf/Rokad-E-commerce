@@ -1,10 +1,8 @@
 import Variant from "../Models/VariantMd.js";
-import Product from "../Models/ProductMd.js";
 import ApiFeatures from "../Utils/apiFeatures.js";
 import catchAsync from "../Utils/catchAsync.js";
 import HandleERROR from "../Utils/handleError.js";
-import fs from "fs";
-import { __dirname } from "../app.js";
+import ProductVariant from "../Models/ProductVariantMd.js";
 export const createVariant = catchAsync(async (req, res, next) => {
   const variant = await Variant.create(req.body);
   return res.status(201).json({
@@ -59,7 +57,7 @@ export const updateVariant = catchAsync(async (req, res, next) => {
 
 export const deleteVariant = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const products = await Product.findOne({ variantId: id });
+  const products = await ProductVariant.findOne({ variantId: id });
   if (products) {
     return next(
       new HandleERROR("Cannot delete variant with associated products", 400)
