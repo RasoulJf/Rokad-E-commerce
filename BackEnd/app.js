@@ -14,6 +14,7 @@ import sliderRouter from "./Routes/Slider.js";
 import variantsRouter from "./Routes/Variant.js";
 import uploadRouter from "./Routes/upload.js";
 import productsRouter from "./Routes/Product.js";
+import productVariantsRouter from "./Routes/ProductVariant.js";
 
 const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
@@ -32,6 +33,7 @@ app.use('/api/categories',categoryRouter)
 app.use('/api/sliders',sliderRouter)
 app.use('/api/variants',variantsRouter)
 app.use('/api/products',productsRouter)
+app.use('/api/product-variants',productVariantsRouter)
 app.use("*", (req, res, next) => {
   next(new HandleERROR("Route not Found", 404));
 });
