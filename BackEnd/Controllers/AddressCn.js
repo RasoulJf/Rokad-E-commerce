@@ -13,26 +13,19 @@ export const createAddress = catchAsync(async (req, res, next) => {
 });
 
 export const getAllAddresses = catchAsync(async (req, res, next) => {
-  let queryString = { ...req.query };
-  if (req.role != "admin") {
-    queryString = {
-      ...queryString,
-      filter: [...queryString.filters, { userId: req.userId }],
-    };
-  }
-  const features = new ApiFeatures(Address, queryString)
+  const features = new ApiFeatures(Address, req.query, req?.role)
     .filter()
+    .manualFilters(req?.role != "admin" ? { userId: req.userId } : "")
     .limitFields()
     .sort()
     .paginate()
-    .secondPopulate({
+    .populate({
       path: "userId",
       select: "fullname username phoneNumber",
     });
-  const addresses = await features.query;
+  const data = await features.execute();
   return res.status(200).json({
-    success: true,
-    data: addresses,
+    data,
   });
 });
 

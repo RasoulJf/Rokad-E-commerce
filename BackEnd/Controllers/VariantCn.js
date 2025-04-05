@@ -13,19 +13,16 @@ export const createVariant = catchAsync(async (req, res, next) => {
 });
 
 export const getAllVariants = catchAsync(async (req, res, next) => {
-  const features = new ApiFeatures(Variant, req.query)
-    .filter()
-    .limitFields()
-    .sort()
-    .paginate()
-    .populate();
-  const variants = await features.query;
-  const count = await Variant.countDocuments(req?.query?.filters);
-  return res.status(200).json({
-    success: true,
-    data: variants,
-    count,
-  });
+    const features = new ApiFeatures(Variant, req.query, req?.role)
+  .filter()
+  .limitFields()
+  .sort()
+  .paginate()
+  .populate();
+const data = await features.execute();
+return res.status(200).json({
+  data,
+});
 });
 
 export const getOneVariant = catchAsync(async (req, res, next) => {

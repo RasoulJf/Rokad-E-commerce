@@ -15,19 +15,16 @@ export const createBrand = catchAsync(async (req, res, next) => {
 });
 
 export const getAllBrands = catchAsync(async (req, res, next) => {
-  const features = new ApiFeatures(Brand, req.query)
-    .filter()
-    .limitFields()
-    .sort()
-    .paginate()
-    .populate();
-  const brands = await features.query;
-  const count = await Brand.countDocuments(req?.query?.filters);
-  return res.status(200).json({
-    success: true,
-    data: brands,
-    count,
-  });
+  const features = new ApiFeatures(Brand, req.query, req?.role)
+  .filter()
+  .limitFields()
+  .sort()
+  .paginate()
+  .populate();
+const data = await features.execute();
+return res.status(200).json({
+  data,
+});
 });
 
 export const getOneBrand = catchAsync(async (req, res, next) => {

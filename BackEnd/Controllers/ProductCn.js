@@ -15,21 +15,17 @@ export const createProduct = catchAsync(async (req, res, next) => {
 });
 
 export const getAllProducts = catchAsync(async (req, res, next) => {
-  const features = new ApiFeatures(Product, req.query)
+    const features = new ApiFeatures(Product, req.query, req?.role)
     .filter()
     .limitFields()
     .sort()
     .paginate()
-    .populate()
-    .secondPopulate("defaultProductVariantId");
-  const products = await features.query;
-  const count = await Product.countDocuments(req?.query?.filters);
+    .populate("defaultProductVariantId");
+  const data = await features.execute();
   return res.status(200).json({
-    success: true,
-    data: products,
-    count,
+    data,
   });
-});
+  });
 
 export const getOneProduct = catchAsync(async (req, res, next) => {
   const { id } = req.params;

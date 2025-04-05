@@ -15,19 +15,16 @@ export const createSlider = catchAsync(async (req, res, next) => {
 
 export const getAllSliders = catchAsync(async (req, res, next) => {
 
-  const features = new ApiFeatures(Slider, req.query)
-    .filter()
-    .limitFields()
-    .sort()
-    .paginate()
-    .populate();
-  const sliders = await features.query;
-  const count = await Slider.countDocuments(req?.query?.filters);
-  return res.status(200).json({
-    success: true,
-    data: sliders,
-    count,
-  });
+  const features = new ApiFeatures(Slider, req.query, req?.role)
+  .filter()
+  .limitFields()
+  .sort()
+  .paginate()
+  .populate();
+const data = await features.execute();
+return res.status(200).json({
+  data,
+});
 });
 
 export const getOneSlider = catchAsync(async (req, res, next) => {
