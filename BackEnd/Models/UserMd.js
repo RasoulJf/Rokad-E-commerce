@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { type } from "os";
 const userSchema=new mongoose.Schema({
     fullname:{
         type:String
@@ -7,29 +6,37 @@ const userSchema=new mongoose.Schema({
     username:{
         type:String
     },
-    password:{
-        type:String
-    },
     phoneNumber:{
         type:String,
-        required :[true,'Phone Number Is Required'],
-        match: [/^(\+98|0)?9\d{9}$/,'Phone Number Ivalid']
+        required:[true,'phone number is required'],
+        match:[/^(\+98|0)?9\d{9}$/,'phone is not valid'],
+        unique:[true,'phone number is exist']
+
     },
-    favoriteProducts:{
-        type:[{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"Product"
-        }]
+    password:{
+        type:String,
+    },
+    favoriteProduct:{
+        type:[
+            {
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'Product'
+            }
+        ],
+        default:[]
+    }
+    ,
+    isComplete:{
+        default:false,
+        type:Boolean
     },
     role:{
         type:String,
-        enum:["user","admin"],
-        default:'user'
-    },
-    isComplete:{
-        type:Boolean,
-        default:false
+        default:'user',
+        enum:['admin','user']
     }
 },{timestamps:true})
-const User=mongoose.model("User",userSchema)
+
+const User=mongoose.model('User',userSchema)
 export default User
+

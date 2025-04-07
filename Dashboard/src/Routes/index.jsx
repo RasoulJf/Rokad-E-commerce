@@ -1,20 +1,19 @@
 import { createBrowserRouter, redirect } from "react-router-dom";
+import Login from "../Pages/Login";
 import store from "../Store";
-import Layout from "../Components/Layout";
+import Layout from "../Layout";
 import Home from "../Pages/Home";
-import GetAllCategories from "../Pages/Categories/GetAll";
+import GetAllCategory from "../Pages/Categories/GetAll";
 import Categories from "../Pages/Categories";
 import CreateCategory from "../Pages/Categories/Create";
 import UpdateCategory from "../Pages/Categories/Update";
-import Login from "../Pages/Login";
 import Brands from "../Pages/Brands";
 import GetAllBrands from "../Pages/Brands/GetAll";
 import CreateBrand from "../Pages/Brands/Create";
 import UpdateBrand from "../Pages/Brands/Update";
-import Users from "../Pages/Users";
-import GetAllUsers from "../Pages/Users/GetAll";
-import UpdateUser from "../Pages/Users/Update";
-
+import Users from "../Pages/User";
+import GetAllUsers from "../Pages/User/GetAll";
+import UpdateUser from "../Pages/User/Update";
 const checkAuth = () => {
   const state = store.getState();
   const token = state?.auth?.token;
@@ -24,7 +23,6 @@ const checkAuth = () => {
   }
   return null;
 };
-
 const checkLogin = () => {
   const state = store.getState();
   const token = state?.auth?.token;
@@ -51,12 +49,12 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/categories",
+        path: "/category",
         element: <Categories />,
         children: [
-          {
-            index:true,
-            element: <GetAllCategories />,
+          { 
+            index:true, 
+            element: <GetAllCategory /> 
           },
           {
             path: "create",
@@ -69,12 +67,12 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/brands",
+        path: "/brand",
         element: <Brands />,
         children: [
-          {
-            index:true,
-            element: <GetAllBrands />,
+          { 
+            index:true, 
+            element: <GetAllBrands /> 
           },
           {
             path: "create",
@@ -87,12 +85,12 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/users",
+        path: "/user",
         element: <Users />,
         children: [
-          {
-            index:true,
-            element: <GetAllUsers />,
+          { 
+            index:true, 
+            element: <GetAllUsers /> 
           },
           {
             path: "update",
@@ -103,5 +101,4 @@ const router = createBrowserRouter([
     ],
   },
 ]);
-
 export default router;

@@ -1,63 +1,67 @@
-import ProductVariant from "../Models/ProductVariantMd.js";
 import Product from "../Models/ProductsMd.js";
-import Variant from "../Models/VariantMd.js";
+import Brand from "../Models/BrandMd.js";
 import ApiFeatures from "../Utils/apiFeatures.js";
 import catchAsync from "../Utils/catchAsync.js";
 import HandleERROR from "../Utils/handleError.js";
+import fs from "fs";
 import { __dirname } from "../app.js";
 export const create = catchAsync(async(req, res, next) => {
-    const variants=await Variant.create(req.body)
+    const brands=await Brand.create(req.body)
     return res.status(201).json({
         success:true,
-        data:variants,
-        message:'Variant create successfully'
+        data:brands,
+        message:'Brand create successfully'
     })
 });
 
 export const getAll = catchAsync(async (req, res, next) => {
-    const features = new ApiFeatures(Variant,req.query,req?.role)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate()
-    .populate()
-    const data=await features.execute()
-    return res.status(200).json(data);
+  const features = new ApiFeatures(Brand,req.query,req?.role)
+  .filter()
+  .sort()
+  .limitFields()
+  .paginate()
+  .populate()
+  const data=await features.execute()
+  return res.status(200).json(data)
 });
 export const getOne = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const variant = await Variant.findById(id);
+  const brand = await Brand.findById(id);
   return res.status(200).json({
     success: true,
-    data: variant,
+    data: brand,
   });
 });
 export const update = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const variant = await Variant.findByIdAndUpdate(id, req.body, {
+
+  const brand = await Brand.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true,
   });
 
   return res.status(200).json({
     success: true,
-    data: variant,
+    data: brand,
   });
 });
 export const remove = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const products = await ProductVariant.findOne({ variantId: id });
+  const products = await Product.findOne({ brandId: id });
   if (products) {
     return next(
       new HandleERROR(
-        "you can't delete this variant, please first delete all Product of this variants",
+        "you can't delete this brans, please first delete all Product of this brands",
         400
       )
     );
   }
-   await Variant.findByIdAndDelete(id);
+  const brand=await Brand.findByIdAndDelete(id);
+  if (brand.image) {
+    fs.unlinkSync(`${__dirname}/Public/${brand.image}`);
+  }
   return res.status(200).json({
     success: true,
-    message:'variant deleted successfully'
+    message:'brand deleted successfully'
   });
 });

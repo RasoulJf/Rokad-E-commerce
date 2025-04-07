@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function GetAllCategory() {
+export default function Users() {
   return (
     <div>
       

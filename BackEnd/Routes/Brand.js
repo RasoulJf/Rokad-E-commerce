@@ -5,13 +5,13 @@ import {
   getOne,
   remove,
   update,
-} from "../Controllers/VariantCn.js";
+} from "../Controllers/BrandCn.js";
 import { isAdmin } from "../Middlewares/isAdmin.js";
-const variantRouter = express.Router();
-variantRouter.route("/").get(getAll).post(isAdmin, create);
-variantRouter
+const brandRouter = express.Router();
+brandRouter.route("/").get(getAll).post(isAdmin, create);
+brandRouter
   .route("/:id")
   .get(getOne)
   .patch(isAdmin, update)
   .delete(isAdmin, remove);
-export default variantRouter;
+export default brandRouter;

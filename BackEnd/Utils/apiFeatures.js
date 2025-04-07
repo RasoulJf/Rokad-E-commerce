@@ -8,14 +8,14 @@ export default class ApiFeatures {
     this.userRole = userRole;
     this.pipeline = [];
     this.countPipeline = [];
-    this.manualFilters = {};
+    this.addManualFilter = {};
     this.#initialSanitization();
   }
 
   // ---------- Core Methods ----------
   filter() {
     const queryFilters = this.#parseQueryFilters();
-    const mergedFilters = { ...queryFilters, ...this.manualFilters };
+    const mergedFilters = { ...queryFilters, ...this.addManualFilter };
     const safeFilters = this.#applySecurityFilters(mergedFilters);
 
     if (Object.keys(safeFilters).length > 0) {
@@ -88,9 +88,9 @@ export default class ApiFeatures {
     return this;
   }
 
-  addManualFilter(filters) {
-    if(filter){
-      this.manualFilters = { ...this.manualFilters, ...filters };
+  addManualFilters(filters) {
+    if(filters){
+      this.addManualFilter = { ...this.addManualFilter, ...filters };
     }
     return this;
   }
@@ -119,7 +119,7 @@ export default class ApiFeatures {
     // Remove dangerous operators
     ["$where", "$accumulator", "$function"].forEach(op => {
       delete this.query[op];
-      delete this.manualFilters[op];
+      delete this.addManualFilter[op];
     });
 
     // Validate numeric fields
