@@ -54,7 +54,8 @@ export const update = catchAsync(async (req, res, next) => {
 export const remove = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const products = await Product.findOne({ categoryId: id });
-  if (products) {
+  const categories = await Category.findOne({ parentCategory: id });
+  if (products || categories) {
     return next(
       new HandleERROR(
         "you can't delete this Category, please first delete all Product of this categories",
