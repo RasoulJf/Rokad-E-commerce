@@ -162,12 +162,11 @@ export const resendCode = catchAsync(async (req, res, next) => {
 
 export const adminLogin=catchAsync(async(req,res,next)=>{
   const { phoneNumber = null, password = null } = req.body;
-    console.log(phoneNumber)
+
   if (!phoneNumber || !password) {
     return next(new HandleERROR("phone and password is required", 400));
   }
   const user = await User.findOne({ phoneNumber });
-  console.log(user)
   if (!user) {
     return next(new HandleERROR("user not found", 400));
   }

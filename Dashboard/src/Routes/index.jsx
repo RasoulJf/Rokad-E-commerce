@@ -79,7 +79,7 @@ const router = createBrowserRouter([
             element: <CreateBrand />,
           },
           {
-            path: "update",
+            path: "update/:id",
             element: <UpdateBrand />,
           },
         ],
@@ -93,7 +93,7 @@ const router = createBrowserRouter([
             element: <GetAllUsers /> 
           },
           {
-            path: "update",
+            path: "update/:id",
             element: <UpdateUser />,
           },
         ],

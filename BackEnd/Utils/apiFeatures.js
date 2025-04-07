@@ -43,7 +43,7 @@ export default class ApiFeatures {
     if (this.query.fields) {
       const allowedFields = this.query.fields
         .split(",")
-        .filter((f) => !securityConfig.forbiddenFields.includes(f))
+        .filter(f => !securityConfig.forbiddenFields.includes(f))
         .reduce((acc, curr) => ({ ...acc, [curr]: 1 }), {});
 
       this.pipeline.push({ $project: allowedFields });
@@ -52,13 +52,17 @@ export default class ApiFeatures {
   }
 
   paginate() {
-    const { maxLimit } = securityConfig.accessLevels[this.userRole] || {
-      maxLimit: 100,
-    };
+    const { maxLimit } = securityConfig.accessLevels[this.userRole] || { maxLimit: 100 };
     const page = Math.max(parseInt(this.query.page, 10) || 1, 1);
-    const limit = Math.min(parseInt(this.query.limit, 10) || 10, maxLimit);
-
-    this.pipeline.push({ $skip: (page - 1) * limit }, { $limit: limit });
+    const limit = Math.min(
+      parseInt(this.query.limit, 10) || 10,
+      maxLimit
+    );
+    
+    this.pipeline.push(
+      { $skip: (page - 1) * limit },
+      { $limit: limit }
+    );
     return this;
   }
 
@@ -66,32 +70,32 @@ export default class ApiFeatures {
     const queryFields = this.query.populate?.split(",") || [];
     const manualFields = fields.split(",").filter(Boolean);
     const allFields = [...new Set([...queryFields, ...manualFields])];
-
-    allFields.forEach((field) => {
+  
+    allFields.forEach(field => {
       const { collection, isArray } = this.#getCollectionInfo(field.trim());
       this.pipeline.push({
         $lookup: {
           from: collection,
           localField: field,
           foreignField: "_id",
-          as: field,
-        },
+          as: field
+        }
       });
-
+  
       // Fix the $unwind stage
       if (isArray) {
         this.pipeline.push({
           $unwind: {
             path: `$${field}`,
-            preserveNullAndEmptyArrays: true,
-          },
+            preserveNullAndEmptyArrays: true
+          }
         });
       } else {
         this.pipeline.push({
           $unwind: {
             path: `$${field}`,
-            preserveNullAndEmptyArrays: true,
-          },
+            preserveNullAndEmptyArrays: true
+          }
         });
       }
     });
@@ -99,7 +103,7 @@ export default class ApiFeatures {
   }
 
   addManualFilters(filters) {
-    if (filters) {
+    if(filters){
       this.addManualFilter = { ...this.addManualFilter, ...filters };
     }
     return this;
@@ -110,14 +114,14 @@ export default class ApiFeatures {
       const [count, data] = await Promise.all([
         this.Model.aggregate([...this.countPipeline, { $count: "total" }]),
         this.Model.aggregate(this.pipeline)
-          .allowDiskUse(options.allowDiskUse || false)
-          .readConcern("majority"),
+          .allowDiskUse(options?.allowDiskUse || false)
+          .readConcern("majority")
       ]);
 
       return {
         success: true,
         count: count[0]?.total || 0,
-        data,
+        data
       };
     } catch (error) {
       this.#handleError(error);
@@ -127,13 +131,13 @@ export default class ApiFeatures {
   // ---------- Security Methods ----------
   #initialSanitization() {
     // Remove dangerous operators
-    ["$where", "$accumulator", "$function"].forEach((op) => {
+    ["$where", "$accumulator", "$function"].forEach(op => {
       delete this.query[op];
       delete this.addManualFilter[op];
     });
 
     // Validate numeric fields
-    ["page", "limit"].forEach((field) => {
+    ["page", "limit"].forEach(field => {
       if (this.query[field] && !/^\d+$/.test(this.query[field])) {
         throw new Error(`Invalid value for ${field}`);
       }
@@ -142,32 +146,26 @@ export default class ApiFeatures {
 
   #parseQueryFilters() {
     const queryObj = { ...this.query };
-    ["page", "limit", "sort", "fields", "populate"].forEach(
-      (el) => delete queryObj[el]
-    );
+    ["page", "limit", "sort", "fields", "populate"].forEach(el => delete queryObj[el]);
 
     return JSON.parse(
-      JSON.stringify(queryObj).replace(
-        /\b(gte|gt|lte|lt|in|nin|eq|ne|regex|exists|size)\b/g,
-        "$$$&"
-      )
+      JSON.stringify(queryObj)
+        .replace(/\b(gte|gt|lte|lt|in|nin|eq|ne|regex|exists|size)\b/g, "$$$&")
     );
   }
-
   #applySecurityFilters(filters) {
     let result = { ...filters };
-
-    // Remove forbidden fields
-    securityConfig.forbiddenFields.forEach((field) => delete result[field]);
-
-    // Role-based filtering
-    if (this.userRole !== "admin") {
+  
+    securityConfig.forbiddenFields.forEach(field => delete result[field]);
+  
+    if (this.userRole !== "admin" && this.Model.schema.path("isActive")) {
       result.isActive = true;
       result = this.#sanitizeNestedObjects(result);
     }
-
+  
     return result;
   }
+  
 
   #sanitizeNestedObjects(obj) {
     return Object.entries(obj).reduce((acc, [key, value]) => {
@@ -205,7 +203,7 @@ export default class ApiFeatures {
 
     return {
       collection: refModel.collection.name,
-      isArray: schemaPath.instance === "Array",
+      isArray: schemaPath.instance === "Array"
     };
   }
 

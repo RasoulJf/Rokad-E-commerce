@@ -20,13 +20,13 @@ export const getAll = catchAsync(async (req, res, next) => {
   if(req?.headers?.authorization){
     role=jwt?.verify(token,process.env.JWT_SECRET).role
   }
-    const features = new ApiFeatures(Category,req.query,req?.role)
+    const features = new ApiFeatures(Category,req.query,role)
     .filter()
     .addManualFilters(req?.role!='admin' ?{isActive:true}:'' )
     .sort()
     .limitFields()
     .paginate()
-    .populate()
+    .populate('parentCategory')
     const data=await features.execute()
     return res.status(200).json(data);
 });
@@ -49,16 +49,18 @@ export const update = catchAsync(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     data: category,
+    message:'Category update successfully'
+
   });
 });
 export const remove = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const products = await Product.findOne({ categoryId: id });
-  const categories = await Category.findOne({ parentCategory: id });
+  const categories=await Category.findOne({parentCategory:id})
   if (products || categories) {
     return next(
       new HandleERROR(
-        "you can't delete this Category, please first delete all Product of this categories",
+        "you can't delete this Category, please first delete all Product or Child Category of this categories",
         400
       )
     );
