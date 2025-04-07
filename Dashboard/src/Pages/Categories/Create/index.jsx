@@ -3,6 +3,7 @@ import fetchData from "../../../Utils/fetchData";
 import { useSelector } from "react-redux";
 import useFormFields from "../../../Utils/useFormFields";
 import notify from "../../../Utils/notify";
+import { useNavigate } from "react-router-dom";
 
 const CreateCategory = () => {
   const [parentCategories, setParentCategories] = useState([]);
@@ -11,8 +12,8 @@ const CreateCategory = () => {
   const { token } = useSelector((state) => state.auth);
   const [fields, handleChange] = useFormFields();
   const [uploading, setUploading] = useState(false);
-  const [image, setImage] = useState();
-
+  const [image,setImage]=useState()
+  const navigate=useNavigate()
   // Fetch parent categories
   useEffect(() => {
     (async () => {
@@ -46,29 +47,31 @@ const CreateCategory = () => {
     if (!response.success) {
       return notify("Image uploaded failed!", "error");
     }
-    console.log(response);
-    setImage(response.file.filename);
-
+    console.log(response)
+    setImage(response.file.filename)
+    
     notify("Image uploaded successfully!", "success");
     setUploading(false);
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
       setLoading(true);
-      const response = await fetchData("category", {
+      const response=await fetchData('category',{
         method: "POST",
         headers: {
           authorization: `Bearer ${token}`,
-          "Content-type": "application/json",
+          'Content-type':'application/json'
         },
-        body: JSON.stringify({ ...fields, image }),
-      });
-      if (response?.success) {
-        notify(response?.message, "success");
-      } else {
-        notify(response?.message, "error");
+        body:JSON.stringify({...fields,image}),
+      })
+      if(response.success){
+        notify(response?.message,'success')
+        navigate('/category')
+      }else{
+        notify(response?.message,'error')
+
       }
     } catch (err) {
       setError(err.response?.message || "Error creating category");
@@ -93,8 +96,8 @@ const CreateCategory = () => {
             Category Name *
           </label>
           <input
-            name="name"
             onChange={handleChange}
+            name="name"
             className={`w-full px-3 py-2 border rounded-md ${"border-gray-300"}`}
           />
         </div>
@@ -103,13 +106,9 @@ const CreateCategory = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Parent Category
           </label>
-          <select
-            onChange={handleChange}
-            name="parentCategory"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          >
+          <select onChange={handleChange} name="parentCategory" className="w-full px-3 py-2 border border-gray-300 rounded-md">
             <option value="">None</option>
-            {parentCategories.map((category) => (
+            {parentCategories?.map((category) => (
               <option key={category._id} value={category._id}>
                 {category.name}
               </option>
@@ -127,7 +126,7 @@ const CreateCategory = () => {
           <input
             type="file"
             id="images"
-            name="image"
+            name="images"
             onChange={handleImageUpload}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             disabled={uploading}
@@ -141,19 +140,20 @@ const CreateCategory = () => {
                 Uploaded Image:
               </p>
               <div className="flex space-x-2 mt-1">
-                <img
-                  src={import.meta.env.VITE_BASE_FILE + image}
-                  alt={`Uploaded`}
-                  className="w-20 h-20 object-cover rounded"
-                />
+                  <img
+                    src={import.meta.env.VITE_BASE_FILE + image}
+                    alt={`Uploaded`}
+                    className="w-20 h-20 object-cover rounded"
+                  />
+           
               </div>
             </div>
           )}
         </div>
         <div className="flex items-center">
           <input
-            name="isActive"
             type="checkbox"
+            name="isActive"
             defaultChecked
             className="h-4 w-4 text-blue-600 border-gray-300 rounded"
           />
