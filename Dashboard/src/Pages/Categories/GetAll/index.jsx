@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import fetchData from "../../../Utils/fetchData";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const GetAllCategory = () => {
   const [categories, setCategories] = useState([]);
@@ -9,12 +10,17 @@ const GetAllCategory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+  const {token}=useSelector((state)=>state.auth)
   const navigate=useNavigate()
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetchData(
-          `category?page=${currentPage}&limit=${itemsPerPage}`
+          `category?page=${currentPage}&limit=${itemsPerPage}`,{
+            headers:{
+              'authorization': `Beraer ${token}`
+            }
+          }
         );
         if (response.success) {
           setCategories(response.data);
