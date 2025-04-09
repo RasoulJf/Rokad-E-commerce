@@ -29,6 +29,7 @@ import ProductVariant from "../Pages/ProductVariant";
 import GetAllProductVariant from "../Pages/ProductVariant/GetAll";
 import CreateProductVariant from "../Pages/ProductVariant/Create";
 import UpdateProductVariant from "../Pages/ProductVariant/Update";
+import Product from "../Pages/Product";
 const checkAuth = () => {
   const state = store.getState();
   const token = state?.auth?.token;
@@ -133,7 +134,7 @@ const router = createBrowserRouter([
     },
     {
       path: "/product",
-      element: <Variant />,
+      element: <Product />,
       children: [
         { 
           index:true, 
