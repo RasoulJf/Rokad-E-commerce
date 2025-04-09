@@ -11,7 +11,11 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiServer ,
-  FiUser 
+  FiUser,
+  FiMap,
+  FiBox,
+  FiCodepen,
+  FiCodesandbox
 } from "react-icons/fi";
 
 const Layout = () => {
@@ -89,7 +93,50 @@ const Layout = () => {
                   </span>
                 </Link>
               </li>
-              
+              <li>
+                <Link
+                  to="/address"
+                  className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                >
+                  <FiMap className="flex-shrink-0" size={20} />
+                  <span className={`ml-3 ${isCollapsed ? 'opacity-0 w-0 absolute' : 'opacity-100'}`}>
+                    Addresses
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/product"
+                  className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                >
+                  <FiBox className="flex-shrink-0" size={20} />
+                  <span className={`ml-3 ${isCollapsed ? 'opacity-0 w-0 absolute' : 'opacity-100'}`}>
+                    Products
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/variant"
+                  className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                >
+                  <FiCodepen className="flex-shrink-0" size={20} />
+                  <span className={`ml-3 ${isCollapsed ? 'opacity-0 w-0 absolute' : 'opacity-100'}`}>
+                    Variants
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/product-variant"
+                  className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                >
+                  <FiCodesandbox className="flex-shrink-0" size={20} />
+                  <span className={`ml-3 ${isCollapsed ? 'opacity-0 w-0 absolute' : 'opacity-100'}`}>
+                   Product Variants
+                  </span>
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
