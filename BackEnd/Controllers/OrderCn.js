@@ -2,6 +2,7 @@
 import Cart from "../Models/CartMd.js";
 import Discount from "../Models/DiscountCodeMd.js";
 import Order from "../models/Order.js";
+import ProductVariant from "../Models/ProductVariantMd.js";
 import { createPayment, verifyPayment } from "../Service/ZarinpalService.js";
 import ApiFeatures from "../Utils/apiFeatures.js";
 import catchAsync from "../Utils/catchAsync.js";
@@ -21,6 +22,32 @@ export const createOrder = catchAsync(async (req, res, next) => {
       return next(new HandleERROR(resultCode.error, 400));
     }
   }
+  let newTotalPrice = 0;
+  let change = false;
+  let newItems = [];
+  for (let item of cart?.items) {
+    const pv = await ProductVariant.findById(item.productVariantId);
+    if (pv.quantity < item.quantity) {
+      item.quantity = pv.quantity;
+      change = true;
+    }
+    item.finalPrice = pv.priceAfterDiscount;
+    newTotalPrice += item.quantity * item.finalPrice;
+    newItems.push(item);
+  }
+  if (newTotalPrice != cart.totalPrice) {
+    change = true;
+  }
+  if (change) {
+    cart.items = newItems;
+    cart.totalPrice = newTotalPrice;
+    const newCart = await cart.save();
+    return res.status(400).json({
+      success: false,
+      data: newCart,
+    });
+  }
+  
 });
 
 export const getOrder = catchAsync(async (req, res, next) => {
