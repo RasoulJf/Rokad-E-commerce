@@ -55,7 +55,7 @@ export const remove = catchAsync(async(req, res, next) => {
 });
 export const create = catchAsync(async(req, res, next) => {
     const {userId=null}=req.body
-    const newUserId = userId && req.role =='admin' ? userId : req.userId
+    const newUserId= userId && req.role=='admin'?userId :req.userId
     const address=await Address.create({...req.body,userId:newUserId})
  
     return res.status(201).json({

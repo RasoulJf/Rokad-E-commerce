@@ -11,14 +11,15 @@ const GetAllAddress = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const navigate = useNavigate();
-const {token}=useSelector(state=>state.auth)
+    const {token}=useSelector(state=>state.auth)
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
         const response = await fetchData(`address?page=${currentPage}&limit=${itemsPerPage}`,{
-          headers:{
-            'authorization': `Beraer ${token}`
-          }
+            method:'GET',
+            headers:{
+                authorization: `Bearer ${token}`
+            }
         });
         if (response.success) {
           setAddresses(response.data);
@@ -62,7 +63,6 @@ const {token}=useSelector(state=>state.auth)
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">All Addresses</h1>
-
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -72,10 +72,19 @@ const {token}=useSelector(state=>state.auth)
                   City
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Receiver
+                  Receiver Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Phone Number
+                  Phone
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Postal Code
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Street
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Province
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Created At
@@ -89,15 +98,12 @@ const {token}=useSelector(state=>state.auth)
                   onClick={() => navigate(`update/${address._id}`)}
                   className="hover:bg-gray-50 transition-colors cursor-pointer"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {address.city}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {address.receiverName}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {address.receiverPhoneNumber}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{address.city}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{address.receiverName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{address.receiverPhoneNumber}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{address.postalCode}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{address.street}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{address.province}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(address.createdAt).toLocaleDateString()}
                   </td>
@@ -107,7 +113,7 @@ const {token}=useSelector(state=>state.auth)
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Pagination Controls */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
@@ -125,19 +131,12 @@ const {token}=useSelector(state=>state.auth)
               Next
             </button>
           </div>
-
+          
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <p className="text-sm text-gray-700">
-                Showing{" "}
-                <span className="font-medium">
-                  {(currentPage - 1) * itemsPerPage + 1}
-                </span>{" "}
-                to{" "}
-                <span className="font-medium">
-                  {Math.min(currentPage * itemsPerPage, totalCount)}
-                </span>{" "}
-                of{" "}
+                Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
+                <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalCount)}</span> of{" "}
                 <span className="font-medium">{totalCount}</span> results
               </p>
               <select
@@ -150,7 +149,7 @@ const {token}=useSelector(state=>state.auth)
                 <option value={50}>50 per page</option>
               </select>
             </div>
-
+            
             <div className="flex gap-2">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}

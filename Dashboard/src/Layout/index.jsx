@@ -11,11 +11,12 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiServer ,
-  FiUser,
-  FiMap,
-  FiBox,
+  FiUser ,
+  FiMap, 
+  FiCodesandbox,
   FiCodepen,
-  FiCodesandbox
+  FiBox,FiPercent,
+  FiMessageSquare
 } from "react-icons/fi";
 
 const Layout = () => {
@@ -100,7 +101,7 @@ const Layout = () => {
                 >
                   <FiMap className="flex-shrink-0" size={20} />
                   <span className={`ml-3 ${isCollapsed ? 'opacity-0 w-0 absolute' : 'opacity-100'}`}>
-                    Addresses
+                    Address
                   </span>
                 </Link>
               </li>
@@ -137,6 +138,30 @@ const Layout = () => {
                   </span>
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/discount-code"
+                  className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                >
+                  <FiPercent className="flex-shrink-0" size={20} />
+                  <span className={`ml-3 ${isCollapsed ? 'opacity-0 w-0 absolute' : 'opacity-100'}`}>
+                   Discount Code
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/comments"
+                  className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                >
+                  <FiMessageSquare className="flex-shrink-0" size={20} />
+                  <span className={`ml-3 ${isCollapsed ? 'opacity-0 w-0 absolute' : 'opacity-100'}`}>
+                   Comments
+                  </span>
+                </Link>
+              </li>
+
+              
             </ul>
           </nav>
         </div>

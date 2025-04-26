@@ -1,5 +1,6 @@
 import { createBrowserRouter, redirect } from "react-router-dom";
 import Login from "../Pages/Login";
+import Product from "../Pages/Product";
 import store from "../Store";
 import Layout from "../Layout";
 import Home from "../Pages/Home";
@@ -18,18 +19,24 @@ import Address from "../Pages/Address";
 import GetAllAddress from "../Pages/Address/GetAll";
 import CreateAddress from "../Pages/Address/Create";
 import UpdateAddress from "../Pages/Address/Update";
-import Variant from "../Pages/Variant";
-import GetAllVariant from "../Pages/Variant/GetAll";
-import CreateVariant from "../Pages/Variant/Create";
-import UpdateVariant from "../Pages/Variant/Update";
 import GetAllProduct from "../Pages/Product/GetAll";
 import CreateProduct from "../Pages/Product/Create";
 import UpdateProduct from "../Pages/Product/Update";
+import Variant from "../Pages/Variants";
+import GetAllVariant from "../Pages/Variants/GetAll";
+import CreateVariant from "../Pages/Variants/Create";
+import UpdateVariant from "../Pages/Variants/Update";
 import ProductVariant from "../Pages/ProductVariant";
 import GetAllProductVariant from "../Pages/ProductVariant/GetAll";
 import CreateProductVariant from "../Pages/ProductVariant/Create";
 import UpdateProductVariant from "../Pages/ProductVariant/Update";
-import Product from "../Pages/Product";
+import DiscountCode from "../Pages/DiscountCode";
+import GetAllDiscountCode from "../Pages/DiscountCode/GetAll";
+import UpdateDiscountCode from "../Pages/DiscountCode/Update";
+import CreateDiscountCode from "../Pages/DiscountCode/Create";
+import Comments from "../Pages/Comments";
+import GetAllComments from "../Pages/Comments/GetAll";
+import Reply from "../Pages/Comments/Reply";
 const checkAuth = () => {
   const state = store.getState();
   const token = state?.auth?.token;
@@ -99,6 +106,107 @@ const router = createBrowserRouter([
             element: <UpdateBrand />,
           },
         ],
+      },{
+        path: "/address",
+        element: <Address />,
+        children: [
+          { 
+            index:true, 
+            element: <GetAllAddress /> 
+          },
+          {
+            path: "create",
+            element: <CreateAddress />,
+          },
+          {
+            path: "update/:id",
+            element: <UpdateAddress />,
+          },
+        ],
+      },
+      {
+        path: "/comments",
+        element: <Comments />,
+        children: [
+          { 
+            index:true, 
+            element: <GetAllComments /> 
+          },
+          {
+            path: "reply/:id",
+            element: <Reply />,
+          },
+        ],
+      },
+      {
+        path: "/product",
+        element: <Product/>,
+        children: [
+          { 
+            index:true, 
+            element: <GetAllProduct /> 
+          },
+          {
+            path: "create",
+            element: <CreateProduct />,
+          },
+          {
+            path: "update/:id",
+            element: <UpdateProduct />,
+          },
+        ],
+      }, {
+        path: "/product-variant",
+        element: <ProductVariant/>,
+        children: [
+          { 
+            index:true, 
+            element: <GetAllProductVariant /> 
+          },
+          {
+            path: "create",
+            element: <CreateProductVariant />,
+          },
+          {
+            path: "update/:id",
+            element: <UpdateProductVariant />,
+          },
+        ],
+      },{
+        path: "/discount-code",
+        element: <DiscountCode/>,
+        children: [
+          { 
+            index:true, 
+            element: <GetAllDiscountCode /> 
+          },
+          {
+            path: "create",
+            element: <CreateDiscountCode />,
+          },
+          {
+            path: "update/:id",
+            element: <UpdateDiscountCode />,
+          },
+        ],
+      },
+      {
+        path: "/variant",
+        element: <Variant/>,
+        children: [
+          { 
+            index:true, 
+            element: <GetAllVariant /> 
+          },
+          {
+            path: "create",
+            element: <CreateVariant />,
+          },
+          {
+            path: "update/:id",
+            element: <UpdateVariant />,
+          },
+        ],
       },
       {
         path: "/user",
@@ -114,78 +222,6 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {
-      path: "/address",
-      element: <Address />,
-      children: [
-        { 
-          index:true, 
-          element: <GetAllAddress /> 
-        },
-        {
-          path: "create",
-          element: <CreateAddress />,
-        },
-        {
-          path: "update/:id",
-          element: <UpdateAddress />,
-        },
-      ],
-    },
-    {
-      path: "/product",
-      element: <Product />,
-      children: [
-        { 
-          index:true, 
-          element: <GetAllProduct /> 
-        },
-        {
-          path: "create",
-          element: <CreateProduct />,
-        },
-        {
-          path: "update/:id",
-          element: <UpdateProduct />,
-        },
-      ],
-    },
-    {
-      path: "/variant",
-      element: <Variant />,
-      children: [
-        { 
-          index:true, 
-          element: <GetAllVariant /> 
-        },
-        {
-          path: "create",
-          element: <CreateVariant />,
-        },
-        {
-          path: "update/:id",
-          element: <UpdateVariant />,
-        },
-      ],
-    },
-    {
-      path: "/product-variant",
-      element: <ProductVariant />,
-      children: [
-        { 
-          index:true, 
-          element: <GetAllProductVariant /> 
-        },
-        {
-          path: "create",
-          element: <CreateProductVariant />,
-        },
-        {
-          path: "update/:id",
-          element: <UpdateProductVariant />,
-        },
-      ],
-    }
     ],
   },
 ]);

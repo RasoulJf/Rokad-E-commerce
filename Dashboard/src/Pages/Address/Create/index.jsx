@@ -64,15 +64,12 @@ const CreateAddress = () => {
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">
-        Create New Address
-      </h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Create New Address</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        
         {/* City Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            City *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
           <input
             name="city"
             onChange={handleChange}
@@ -83,9 +80,7 @@ const CreateAddress = () => {
 
         {/* Receiver Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Receiver Name *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Receiver Name *</label>
           <input
             name="receiverName"
             onChange={handleChange}
@@ -96,9 +91,7 @@ const CreateAddress = () => {
 
         {/* Receiver Phone Number */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Receiver Phone Number *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Receiver Phone Number *</label>
           <input
             name="receiverPhoneNumber"
             onChange={handleChange}
@@ -109,9 +102,7 @@ const CreateAddress = () => {
 
         {/* Postal Code */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Postal Code *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code *</label>
           <input
             name="postalCode"
             onChange={handleChange}
@@ -122,9 +113,7 @@ const CreateAddress = () => {
 
         {/* Street */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Street *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Street *</label>
           <input
             name="street"
             onChange={handleChange}
@@ -135,9 +124,7 @@ const CreateAddress = () => {
 
         {/* Plaque */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Plaque *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Plaque *</label>
           <input
             name="plaque"
             onChange={handleChange}
@@ -148,9 +135,7 @@ const CreateAddress = () => {
 
         {/* Province */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Province *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Province *</label>
           <input
             name="province"
             onChange={handleChange}
@@ -161,9 +146,7 @@ const CreateAddress = () => {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <textarea
             name="description"
             onChange={handleChange}
@@ -174,9 +157,7 @@ const CreateAddress = () => {
 
         {/* Select Box for User */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            User *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">User *</label>
           <select
             name="userId"
             value={fields.userId || ""}
@@ -186,8 +167,7 @@ const CreateAddress = () => {
             <option value="">Select a user</option>
             {users.map((user) => (
               <option key={user._id} value={user._id}>
-                {user.name || user.phoneNumber}{" "}
-                {/* Adjust this based on your user object (e.g. user.email) */}
+                {user.name || user.phoneNumber} {/* Adjust this based on your user object (e.g. user.email) */}
               </option>
             ))}
           </select>

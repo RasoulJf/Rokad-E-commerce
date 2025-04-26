@@ -1,5 +1,5 @@
-import React from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import React from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 const Address = () => {
   const navigate = useNavigate();
@@ -17,4 +17,4 @@ const Address = () => {
   );
 };
 
-export default Address;
+export default Address; 
