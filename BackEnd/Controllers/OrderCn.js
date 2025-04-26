@@ -1,32 +1,26 @@
 // controllers/orderController.js
+import Cart from "../Models/CartMd.js";
+import Discount from "../Models/DiscountCodeMd.js";
 import Order from "../models/Order.js";
 import { createPayment, verifyPayment } from "../Service/ZarinpalService.js";
 import ApiFeatures from "../Utils/apiFeatures.js";
 import catchAsync from "../Utils/catchAsync.js";
 import HandleERROR from "../Utils/handleError.js";
+import { checkCode } from "./DiscountCodeCn.js";
 
 // Create new order
 export const createOrder = catchAsync(async (req, res, next) => {
-  const order = await Order.create({
-    ...req.body,
-    totalPrice: req.body.totalPrice,
-    totalPriceAfterDiscount: req.body.totalPriceAfterDiscount,
-  });
-  const amount = order.totalPriceAfterDiscount || order.totalPrice;
-  const result = await createPayment(amount, `Order #${order._id}`, order._id);
-  if (result.data && result.data.code === 100) {
-    order.authority = result.data.authority;
-    await order.save();
-    return res
-      .status(200)
-      .json({ url: `${ZARINPAL.GATEWAY}${result.data.authority}` });
+  const userId = req?.userId;
+  const { code = null } = req?.body;
+  const cart = await Cart.findOne({ userId });
+  let confirmDiscount;
+  if (code) {
+    confirmDiscount == (await Discount.findOne({ code }));
+    const resultCode = checkCode(discount, cart?.totalPrice, userId);
+    if (!resultCode.success) {
+      return next(new HandleERROR(resultCode.error, 400));
+    }
   }
-  return next(
-    new HandleERROR(
-      result.errors?.[0]?.message || "Payment initiation failed",
-      400
-    )
-  );
 });
 
 export const getOrder = catchAsync(async (req, res, next) => {
@@ -35,7 +29,7 @@ export const getOrder = catchAsync(async (req, res, next) => {
   return res.status(200).json(order);
 });
 
-export const getAll= catchAsync(async (req, res, next) => {
+export const getAll = catchAsync(async (req, res, next) => {
   const features = new ApiFeatures(Order, req.query, req.role)
     .addManualFilters(
       req?.role != "admin" && req?.role != "superAdmin"
@@ -47,8 +41,8 @@ export const getAll= catchAsync(async (req, res, next) => {
     .paginate()
     .populate()
     .limitFields();
-    const date=await features.execute()
-    return res.status(200).json(data)
+  const date = await features.execute();
+  return res.status(200).json(data);
 });
 
 export const zarinpalCallback = catchAsync(async (req, res, next) => {
