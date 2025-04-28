@@ -93,16 +93,15 @@ export const createOrder = catchAsync(async (req, res, next) => {
   if (payment.data && payment.data.code === 100) {
     newOrder.authority = payment.data.authority;
     await newOrder.save();
+    if (confirmDiscount) {
+      confirmDiscount.userIdsUsed.push(userId);
+      await confirmDiscount.save();
+    }
+    return res.status(200).json({
+      success: true,
+      url: `${ZARINPAL.GATEWAY}${payment.data.authority}`,
+    });
   }
-
-  if (confirmDiscount) {
-    confirmDiscount.userIdsUsed.push(userId);
-    await confirmDiscount.save();
-  }
-  return res.status(200).json({
-    success: true,
-    url: `${ZARINPAL.GATEWAY}${payment.data.authority}`,
-  });
 });
 
 export const getOrder = catchAsync(async (req, res, next) => {
