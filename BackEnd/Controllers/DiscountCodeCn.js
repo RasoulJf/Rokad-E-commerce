@@ -19,7 +19,7 @@ export const checkCode = (discount, totalPrice, userId) => {
     } else if (exTime < now) {
       err = "discount is expired";
     } else if (userUsedCount >= discount.maxUsedCount) {
-      err = "discount code already used";
+      err = "discount code already used"; 
     } else if (discount?.minPrice && discount.minPrice > totalPrice) {
       err = "discount is not valid for this price";
     }
