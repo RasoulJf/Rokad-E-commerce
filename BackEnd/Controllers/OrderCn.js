@@ -13,95 +13,112 @@ import catchAsync from "../Utils/catchAsync.js";
 import HandleERROR from "../Utils/handleError.js";
 import { checkCode } from "./DiscountCodeCn.js";
 
-// Create new order
 export const createOrder = catchAsync(async (req, res, next) => {
-  const userId = req?.userId;
-  const { code = null } = req?.body;
-  const cart = await Cart.findOne({ userId });
-  if (!cart || !cart.items.length) {
-    return next(new HandleERROR("Cart is empty", 400));
-  }
+  const session = await mongoose.startSession();
+  return session
+    .withTransaction(async () => {
+      const { addressId, code = null } = req.body;
+      if (!addressId)
+        return next(new HandleERROR("Address ID is required", 400));
 
-  let confirmDiscount;
-  if (code) {
-    confirmDiscount = await Discount.findOne({ code });
-    const resultCode = checkCode(code, cart?.totalPrice, userId);
-    if (!resultCode.success) {
-      return next(new HandleERROR(resultCode.error, 400));
-    }
-  }
+      const cart = await Cart.findOne({ userId: req.userId }).lean();
+      if (!cart || cart.items.length === 0)
+        return next(new HandleERROR("Cart is empty", 400));
 
-  let newTotalPrice = 0;
-  let change = false;
-  let newItems = [];
+      let discount;
+      if (code) {
+        discount = await Discount.findOne({ code }).lean();
+        const result = checkCode(discount, cart.totalPrice, req.userId);
+        if (!result.success) return next(new HandleERROR(result.error, 400));
+      }
 
-  for (let item of cart?.items) {
-    const pv = await ProductVariant.findById(item.productVariantId);
-    if (!pv) continue;
-    if (pv.quantity < item.quantity) {
-      item.quantity = pv.quantity;
-      change = true;
-    }
-    item.finalPrice = pv.priceAfterDiscount;
-    newTotalPrice += item.quantity * item.finalPrice;
-    newItems.push(item);
-  }
+      const variantIds = cart.items.map((i) => i.productVariantId);
+      const variants = await ProductVariant.find({
+        _id: { $in: variantIds },
+      }).lean();
+      const variantMap = new Map(variants.map((v) => [v._id.toString(), v]));
 
-  if (newTotalPrice != cart.totalPrice) {
-    change = true;
-  }
+      let newTotal = 0;
+      const newItems = cart.items.map((item) => {
+        const pv = variantMap.get(item.productVariantId.toString());
+        const qty = Math.min(item.quantity, pv.quantity);
+        const price = pv.priceAfterDiscount;
+        newTotal += qty * price;
+        return { ...item, quantity: qty, finalPrice: price };
+      });
 
-  if (change) {
-    cart.items = newItems;
-    cart.totalPrice = newTotalPrice;
-    const newCart = await cart.save();
-    return res.status(400).json({
-      success: false,
-      data: newCart,
+      if (newTotal !== cart.totalPrice) {
+        await Cart.updateOne(
+          { _id: cart._id },
+          {
+            items: newItems,
+            totalPrice: newTotal,
+          },
+          { session }
+        );
+        return res.status(400).json({
+          success: false,
+          data: { items: newItems, totalPrice: newTotal },
+        });
+      }
+
+      let finalTotal = newTotal;
+      if (discount) {
+        const discountAmount =
+          (Math.min(discount.maxPrice || finalTotal, finalTotal) *
+            discount.percent) /
+          100;
+        finalTotal -= discountAmount;
+      }
+
+      const orderData = {
+        userId: req.userId,
+        addressId,
+        items: newItems,
+        totalPrice: newTotal,
+        totalPriceAfterDiscount: finalTotal,
+        discountId: discount?._id,
+      };
+      const order = await Order.create([orderData], { session });
+
+      const payment = await createPayment(
+        finalTotal,
+        "Payment Gateway",
+        order[0]._id
+      );
+      if (!(payment.data && payment.data.code === 100)) {
+        throw new HandleERROR(
+          "Error establishing connection with the payment gateway",
+          400
+        );
+      }
+      order[0].authority = payment.data.authority;
+      await order[0].save({ session });
+
+      if (discount) {
+        await Discount.updateOne(
+          { _id: discount._id },
+          { $push: { userIdsUsed: req.userId } },
+          { session }
+        );
+      }
+      const bulkOps = newItems.map((item) => ({
+        updateOne: {
+          filter: { _id: item.productVariantId },
+          update: { $inc: { quantity: -item.quantity } },
+        },
+      }));
+      await ProductVariant.bulkWrite(bulkOps, { session });
+
+      res.status(200).json({
+        success: true,
+        url: `${ZARINPAL.GATEWAY}${payment.data.authority}`,
+      });
+    })
+    .catch((err) => {
+      session.endSession();
+      next(err);
     });
-  }
-
-  let newTotalPriceAfterDiscount = newTotalPrice;
-  if (confirmDiscount) {
-    discountAmount =
-      (confirmDiscount.maxPrice
-        ? confirmDiscount.maxPrice >= newTotalPrice
-          ? confirmDiscount.maxPrice * confirmDiscount.percent
-          : newTotalPrice * confirmDiscount.percent
-        : newTotalPrice * confirmDiscount.percent) / 100;
-    newTotalPriceAfterDiscount -= discountAmount;
-  }
-
-  const payloadOrder = {
-    userId,
-    addressId,
-    items: newItems,
-    totalPrice: newTotalPrice,
-    totalPriceAfterDiscount: newTotalPriceAfterDiscount,
-  };
-  if (confirmDiscount) {
-    payloadOrder.discountId = confirmDiscount._id;
-  }
-  const newOrder = await Order.create(payloadOrder);
-
-  const payment = await createPayment(
-    newTotalPriceAfterDiscount,
-    `Rokad E-Commerce GATEWAY`,
-    newOrder._id
-  );
-
-  if (payment.data && payment.data.code === 100) {
-    newOrder.authority = payment.data.authority;
-    await newOrder.save();
-    if (confirmDiscount) {
-      confirmDiscount.userIdsUsed.push(userId);
-      await confirmDiscount.save();
-    }
-    return res.status(200).json({
-      success: true,
-      url: `${ZARINPAL.GATEWAY}${payment.data.authority}`,
-    });
-  }
 });
 
 export const getOrder = catchAsync(async (req, res, next) => {
