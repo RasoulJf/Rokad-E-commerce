@@ -14,19 +14,27 @@ export const createOrder = catchAsync(async (req, res, next) => {
   const userId = req?.userId;
   const { code = null } = req?.body;
   const cart = await Cart.findOne({ userId });
+  if (!cart || !cart.items.length) {
+    return next(new HandleERROR("Cart is empty", 400));
+  }
+
   let confirmDiscount;
+  let discountAmount = 0;
   if (code) {
-    confirmDiscount == (await Discount.findOne({ code }));
-    const resultCode = checkCode(discount, cart?.totalPrice, userId);
+    confirmDiscount = await Discount.findOne({ code });
+    const resultCode = checkCode(code, cart?.totalPrice, userId);
     if (!resultCode.success) {
       return next(new HandleERROR(resultCode.error, 400));
     }
   }
+
   let newTotalPrice = 0;
   let change = false;
   let newItems = [];
+  
   for (let item of cart?.items) {
     const pv = await ProductVariant.findById(item.productVariantId);
+    if (!pv) continue;
     if (pv.quantity < item.quantity) {
       item.quantity = pv.quantity;
       change = true;
@@ -35,9 +43,11 @@ export const createOrder = catchAsync(async (req, res, next) => {
     newTotalPrice += item.quantity * item.finalPrice;
     newItems.push(item);
   }
+
   if (newTotalPrice != cart.totalPrice) {
     change = true;
   }
+
   if (change) {
     cart.items = newItems;
     cart.totalPrice = newTotalPrice;
@@ -47,7 +57,42 @@ export const createOrder = catchAsync(async (req, res, next) => {
       data: newCart,
     });
   }
-  
+
+  if (confirmDiscount) {
+    discountAmount = Math.floor((newTotalPrice * confirmDiscount.percent) / 100);
+    if (confirmDiscount.maxPrice && discountAmount > confirmDiscount.maxPrice) {
+      discountAmount = confirmDiscount.maxPrice;
+    }
+    newTotalPrice -= discountAmount;
+  }
+
+  const newOrder = await Order.create({
+    userId,
+    items: cart.items,
+    totalPrice: cart.totalPrice,
+    discountAmount,
+    totalPriceAfterDiscount: newTotalPrice,
+    status: "pending",
+    code: code || undefined,
+  });
+
+  const payment = await createPayment(
+    newTotalPrice,
+    `Order ${newOrder._id}`,
+    newOrder._id
+  );
+
+  if (!payment.data || payment.data.code !== 100) {
+    return next(new HandleERROR("Payment creation failed", 400));
+  }
+
+  newOrder.authority = payment.data.authority;
+  await newOrder.save();
+
+  return res.status(200).json({
+    success: true,
+    url: `https://www.zarinpal.com/pg/StartPay/${payment.data.authority}`,
+  });
 });
 
 export const getOrder = catchAsync(async (req, res, next) => {
