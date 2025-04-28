@@ -3,7 +3,11 @@ import Cart from "../Models/CartMd.js";
 import Discount from "../Models/DiscountCodeMd.js";
 import Order from "../models/Order.js";
 import ProductVariant from "../Models/ProductVariantMd.js";
-import { createPayment, verifyPayment } from "../Service/ZarinpalService.js";
+import {
+  createPayment,
+  verifyPayment,
+  ZARINPAL,
+} from "../Service/ZarinpalService.js";
 import ApiFeatures from "../Utils/apiFeatures.js";
 import catchAsync from "../Utils/catchAsync.js";
 import HandleERROR from "../Utils/handleError.js";
@@ -19,7 +23,6 @@ export const createOrder = catchAsync(async (req, res, next) => {
   }
 
   let confirmDiscount;
-  let discountAmount = 0;
   if (code) {
     confirmDiscount = await Discount.findOne({ code });
     const resultCode = checkCode(code, cart?.totalPrice, userId);
@@ -31,7 +34,7 @@ export const createOrder = catchAsync(async (req, res, next) => {
   let newTotalPrice = 0;
   let change = false;
   let newItems = [];
-  
+
   for (let item of cart?.items) {
     const pv = await ProductVariant.findById(item.productVariantId);
     if (!pv) continue;
@@ -58,40 +61,47 @@ export const createOrder = catchAsync(async (req, res, next) => {
     });
   }
 
+  let newTotalPriceAfterDiscount = newTotalPrice;
   if (confirmDiscount) {
-    discountAmount = Math.floor((newTotalPrice * confirmDiscount.percent) / 100);
-    if (confirmDiscount.maxPrice && discountAmount > confirmDiscount.maxPrice) {
-      discountAmount = confirmDiscount.maxPrice;
-    }
-    newTotalPrice -= discountAmount;
+    discountAmount =
+      (confirmDiscount.maxPrice
+        ? confirmDiscount.maxPrice >= newTotalPrice
+          ? confirmDiscount.maxPrice * confirmDiscount.percent
+          : newTotalPrice * confirmDiscount.percent
+        : newTotalPrice * confirmDiscount.percent) / 100;
+    newTotalPriceAfterDiscount -= discountAmount;
   }
 
-  const newOrder = await Order.create({
+  const payloadOrder = {
     userId,
-    items: cart.items,
-    totalPrice: cart.totalPrice,
-    discountAmount,
-    totalPriceAfterDiscount: newTotalPrice,
-    status: "pending",
-    code: code || undefined,
-  });
+    addressId,
+    items: newItems,
+    totalPrice: newTotalPrice,
+    totalPriceAfterDiscount: newTotalPriceAfterDiscount,
+  };
+  if (confirmDiscount) {
+    payloadOrder.discountId = confirmDiscount._id;
+  }
+  const newOrder = await Order.create(payloadOrder);
 
   const payment = await createPayment(
-    newTotalPrice,
-    `Order ${newOrder._id}`,
+    newTotalPriceAfterDiscount,
+    `Rokad E-Commerce GATEWAY`,
     newOrder._id
   );
 
-  if (!payment.data || payment.data.code !== 100) {
-    return next(new HandleERROR("Payment creation failed", 400));
+  if (payment.data && payment.data.code === 100) {
+    newOrder.authority = payment.data.authority;
+    await newOrder.save();
   }
 
-  newOrder.authority = payment.data.authority;
-  await newOrder.save();
-
+  if (confirmDiscount) {
+    confirmDiscount.userIdsUsed.push(userId);
+    await confirmDiscount.save();
+  }
   return res.status(200).json({
     success: true,
-    url: `https://www.zarinpal.com/pg/StartPay/${payment.data.authority}`,
+    url: `${ZARINPAL.GATEWAY}${payment.data.authority}`,
   });
 });
 
